@@ -1,7 +1,9 @@
-import spotipy.util
-import spotipy
 import random
+
 import pylast
+import spotipy
+import spotipy.util
+
 import credentials  # TODO Better way to store credentials
 
 
@@ -34,7 +36,7 @@ def get_attributes(sample, sp):
     for item in sample:
         # Some attributes are stored in the track and some can only be retrieved from track_features
         track_features = sp.audio_features(item['track']['id'])[0]
-        playcount = 0  # TODO Actually collect playcount somehow, probably with pylast
+        playcount = 0  # TODO Actually collect playcount somehow, probably with pyLast
 
         track = [{'name': item['track']['name'],
                   'artist': item['track']['artists'][0]['name'],
