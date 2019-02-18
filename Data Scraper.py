@@ -1,10 +1,10 @@
 import random
 
-import pylast
+import requests
 import spotipy
 import spotipy.util
 
-import credentials  # TODO Better way to store credentials
+import config  # TODO Better way to store credentials
 
 
 def collect_data(sp):
@@ -25,18 +25,32 @@ def collect_data(sp):
     return results
 
 
-def get_attributes(sample, sp):
+def get_attributes(sample, sp, lastfm_api_key, lastfm_username):
     """Gets all of the attributes of tracks from a sample
 
         Keyword Arguments:
             sample -- The list of tracks
             sp -- The Spotify authorized session
+            lastfm_api_key -- The API Key for Last.fm requests
+            lastfm_username -- The username for Last.fm requests
     """
     attributes = []
     for item in sample:
         # Some attributes are stored in the track and some can only be retrieved from track_features
         track_features = sp.audio_features(item['track']['id'])[0]
-        playcount = 0  # TODO Actually collect playcount somehow, probably with pyLast
+        # Gets the data stored by Last.fm, including the user's playcount
+        r = requests.get(url="http://ws.audioscrobbler.com/2.0/?method=track.getInfo",
+                         params={'api_key': lastfm_api_key,
+                                 'track': item['track']['name'],
+                                 'artist': item['track']['artists'][0]['name'],
+                                 'username': lastfm_username,
+                                 'format': "json"})
+
+        try:
+            playcount = r.json()['track']['userplaycount']
+        except KeyError:  # If  there is no playcount value it means that it is zero
+            print("Playcount not found for " + r.json()['track']['name'] + " - " + r.json()['track']['artist']['name'])
+            playcount = 0
 
         track = [{'name': item['track']['name'],
                   'artist': item['track']['artists'][0]['name'],
@@ -62,36 +76,34 @@ def get_attributes(sample, sp):
 
 
 def main():
-    sample_size = 30  # TODO modifiable sample size
-
+    spotify_api_key = "726bfaf7c99a484d95e38ba78c69b315"
+    spotify_redirect_uri = "http://localhost:8888/"
     spotify_scope = 'user-library-read'  # Gives permission to read the user's spotify library
 
+    lastfm_api_key = "f8fa93dcc38cf66cfde99abf180ddaf8"
+
     # Authorizes the user so Spotify's API can access their data.  Potential TODO streamline the process
-    spotify_token = spotipy.util.prompt_for_user_token(credentials.spotify_username, spotify_scope,
-                                                       client_id=credentials.spotify_api_key,
-                                                       client_secret=credentials.spotify_api_secret,
-                                                       redirect_uri=credentials.spotify_redirect_uri)
+    spotify_token = spotipy.util.prompt_for_user_token(config.spotify_username, spotify_scope,
+                                                       client_id=spotify_api_key,
+                                                       client_secret=config.spotify_api_secret,
+                                                       redirect_uri=spotify_redirect_uri)
 
-    # Authorizes the API to access the user's Last.fm profile
-    lastfm_network = pylast.LastFMNetwork(api_key=credentials.lastfm_api_key,
-                                          api_secret=credentials.lastfm_api_secret,
-                                          username=credentials.lastfm_username,
-                                          password_hash=credentials.lastfm_password_hash)
-
-    if spotify_token and lastfm_network:
-        print("Retrieved Spotify token and Last.fm network")
+    if spotify_token:
         sp = spotipy.Spotify(auth=spotify_token)
 
         dataset = collect_data(sp)
-        sample = random.sample(dataset, sample_size)
-        attributes = get_attributes(sample, sp)
+
+        if config.sample_size > len(dataset):
+            sample = dataset
+        else:
+            sample = random.sample(dataset, config.sample_size)
+
+        attributes = get_attributes(sample, sp, lastfm_api_key, config.lastfm_username)
 
         for item in attributes:
             print(item)  # TODO Analyze Data
-    elif not spotify_token:
-        print("Can't get Spotify token for ", credentials.spotify_username)
     else:
-        print("Can't get Last.fm network for ", credentials.lastfm_username)
+        print("Can't get Spotify token for ", config.spotify_username)
 
 
 if __name__ == "__main__":
