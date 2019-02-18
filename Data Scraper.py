@@ -48,9 +48,11 @@ def get_attributes(sample, sp, lastfm_api_key, lastfm_username):
 
         try:
             playcount = r.json()['track']['userplaycount']
-        except KeyError:  # If  there is no playcount value it means that it is zero
+        except KeyError:  # If  there is no playcount value it means that last.fm did not collect the data correctly
             print("Playcount not found for " + r.json()['track']['name'] + " - " + r.json()['track']['artist']['name'])
-            playcount = 0
+            playcount = 1  # I have listened to every song in my Spotify library at least once
+            # There could be issues detecting due to listening on other platforms that have not been linked to Last.fm,
+            # such as live performances, the radio, or streaming platforms like Youtube.
 
         track = [{'name': item['track']['name'],
                   'artist': item['track']['artists'][0]['name'],
