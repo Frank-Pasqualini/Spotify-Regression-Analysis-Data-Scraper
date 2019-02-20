@@ -24,9 +24,14 @@ sample_size = 30
 
 ```
 
-You can then run the script with:
+You can then run the script to collect the data with:
 ```bash
 python "Data Scraper.py"
+```
+
+and run the script to analyze the data with:
+```bash
+python "Data Analysis.py"
 ```
 
 ## Built With
