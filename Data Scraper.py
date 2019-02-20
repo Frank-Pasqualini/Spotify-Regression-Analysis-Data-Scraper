@@ -1,5 +1,6 @@
 import random
 
+import pickle
 import requests
 import spotipy
 import spotipy.util
@@ -104,8 +105,9 @@ def main():
 
         attributes = get_attributes(sample, sp, lastfm_api_key, config.lastfm_username)
 
-        for item in attributes:
-            print(item)  # TODO Analyze Data
+        out_file = open('output.data', 'wb')
+        pickle.dump(attributes, out_file)
+        out_file.close()
     else:
         print("Can't get Spotify token for ", config.spotify_username)
 
