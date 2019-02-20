@@ -1,6 +1,6 @@
+import pickle
 import random
 
-import pickle
 import requests
 import spotipy
 import spotipy.util
@@ -48,12 +48,7 @@ def get_attributes(sample, sp, lastfm_api_key, lastfm_username):
                                  'format': "json"})
 
         try:
-            try:
-                data = r.json()
-                track = data['track']
-            except KeyError:
-                continue
-            playcount = track['userplaycount']
+            playcount = r.json()['track']['userplaycount']
         except KeyError:  # If  there is no playcount value it means that last.fm did not collect the data correctly
             continue
 
@@ -98,6 +93,7 @@ def main():
 
         dataset = collect_data(sp)
 
+        # Collects a sample of the configured size
         if config.sample_size > len(dataset):
             sample = dataset
         else:
@@ -105,6 +101,7 @@ def main():
 
         attributes = get_attributes(sample, sp, lastfm_api_key, config.lastfm_username)
 
+        # Writes the data to a file
         out_file = open('output.data', 'wb')
         pickle.dump(attributes, out_file)
         out_file.close()
