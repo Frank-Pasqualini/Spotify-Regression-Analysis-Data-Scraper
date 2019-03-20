@@ -7,8 +7,8 @@ import numpy as np
 def gather(data, category):
     output = []
     if category[0:3] == "adj":
-        counter = 0
         for item in data:
+            counter = 0
             while counter < int(item['playcount']):
                 if category == 'name' or category == 'artist' or category == 'album':
                     output.append(item[category[4:]])
@@ -34,7 +34,7 @@ def plot_hist(data, title):
 
 
 def plot_scatter(data, title, playcount):
-    if title == 'name' or title == 'artist' or title == 'album' or title[0:3] == "adj":
+    if title == 'name' or title == 'artist' or title == 'album' or title[0:3] == "adj" or title == 'playcount':
         return
 
     plt.plot(data, playcount, 'o')
@@ -48,18 +48,18 @@ def main():
     data = pickle.load(out_file)
     out_file.close()
 
-    category_lists = {'name': [], 'artist': [], 'album': [], 'playcount': [], 'duration_ms': [], 'explicit': [],
-                      'popularity': [], 'key': [], 'mode': [], 'time_signature': [], 'acousticness': [],
-                      'danceability': [], 'energy': [], 'instrumentalness': [], 'liveness': [], 'loudness': [],
-                      'speechiness': [], 'valence': [], 'tempo': [], 'adj_duration_ms': [], 'adj_explicit': [],
-                      'adj_popularity': [], 'adj_key': [], 'adj_mode': [], 'adj_time_signature': [],
-                      'adj_acousticness': [], 'adj_danceability': [], 'adj_energy': [], 'adj_instrumentalness': [],
-                      'adj_liveness': [], 'adj_loudness': [], 'adj_speechiness': [], 'adj_valence': [], 'adj_tempo': []}
+    category_lists = {'name': [], 'artist': [], 'album': [], 'playcount': [], 'duration_ms': [], 'adj_duration_ms': [],
+                      'explicit': [], 'adj_explicit': [], 'popularity': [], 'adj_popularity': [], 'key': [],
+                      'adj_key': [], 'mode': [], 'adj_mode': [], 'time_signature': [], 'adj_time_signature': [],
+                      'acousticness': [], 'adj_acousticness': [], 'danceability': [], 'adj_danceability': [],
+                      'energy': [], 'adj_energy': [], 'instrumentalness': [], 'adj_instrumentalness': [],
+                      'liveness': [], 'adj_liveness': [], 'loudness': [], 'adj_loudness': [], 'speechiness': [],
+                      'adj_speechiness': [], 'valence': [], 'adj_valence': [], 'tempo': [], 'adj_tempo': []}
 
     for category in category_lists:
         category_lists[category] = gather(data, category)
-        plot_hist(category_lists[category], category)
         plot_scatter(category_lists[category], category, category_lists['playcount'])
+        plot_hist(category_lists[category], category)
 
 
 if __name__ == "__main__":
