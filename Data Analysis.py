@@ -30,7 +30,8 @@ def plot_hist(data, title):
 
     plt.hist(x=data, bins='auto')
     plt.title(title + " (x̄=" + str(np.mean(data)) + " s=" + str(np.std(data)) + ")")
-    plt.show()
+    plt.savefig("./Documentation/Graphs/Histograms/" + title + ".png")
+    plt.close()
 
 
 def plot_scatter(data, title, playcount):
@@ -39,7 +40,8 @@ def plot_scatter(data, title, playcount):
 
     plt.plot(data, playcount, 'o')
     plt.title("playcount vs " + title)
-    plt.show()
+    plt.savefig("./Documentation/Graphs/Scatter Plots/" + title + ".png")
+    plt.close()
 
 
 def main():
