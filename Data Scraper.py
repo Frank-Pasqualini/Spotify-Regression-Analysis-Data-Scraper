@@ -39,6 +39,7 @@ def get_attributes(sample, sp, lastfm_api_key, lastfm_username):
     for item in sample:
         # Some attributes are stored in the track and some can only be retrieved from track_features
         track_features = sp.audio_features(item['track']['id'])[0]
+        album = sp.album(item['track']['album']['id'])
         # Gets the data stored by Last.fm, including the user's playcount
         r = requests.get(url="http://ws.audioscrobbler.com/2.0/?method=track.getInfo",
                          params={'api_key': lastfm_api_key,
@@ -70,7 +71,9 @@ def get_attributes(sample, sp, lastfm_api_key, lastfm_username):
                   'loudness': track_features['loudness'],
                   'speechiness': track_features['speechiness'],
                   'valence': track_features['valence'],
-                  'tempo': track_features['tempo']}]
+                  'tempo': track_features['tempo'],
+                  'release_date': album['release_date'][0:4],
+                  'album_popularity': album['popularity']}]
         attributes = attributes + track
     return attributes
 

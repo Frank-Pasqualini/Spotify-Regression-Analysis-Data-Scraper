@@ -56,7 +56,8 @@ def main():
                       'acousticness': [], 'adj_acousticness': [], 'danceability': [], 'adj_danceability': [],
                       'energy': [], 'adj_energy': [], 'instrumentalness': [], 'adj_instrumentalness': [],
                       'liveness': [], 'adj_liveness': [], 'loudness': [], 'adj_loudness': [], 'speechiness': [],
-                      'adj_speechiness': [], 'valence': [], 'adj_valence': [], 'tempo': [], 'adj_tempo': []}
+                      'adj_speechiness': [], 'valence': [], 'adj_valence': [], 'tempo': [], 'adj_tempo': [],
+                      'release_date': [], 'adj_release_date': [], 'album_popularity': [], 'adj_album_popularity': []}
 
     for category in category_lists:
         category_lists[category] = gather(data, category)
