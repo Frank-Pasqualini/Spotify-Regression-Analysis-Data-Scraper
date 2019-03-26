@@ -4,10 +4,10 @@ This is a project I am working on for my Applied Regression Writing class.  The 
 
 ### Prerequisites
 
-This project requires both the Spotipy and requests libraries, which can be installed as follows:
+This project requires the Spotipy, requests, matplotlib, numpy, statsmodels, and pandas libraries, which can be installed as follows:
 
 ```
-pip install spotipy requests
+pip install spotipy requests matplotlib numpy statsmodels pandas
 ```
 
 ## Getting Started
