@@ -69,7 +69,6 @@ def plot_scatter(data, title, playcount):
     plt.close()
 
 
-# TODO Figure out the best transformations for the variables
 def transform(data):
     """Transforms the data to improve regression
 
@@ -77,12 +76,35 @@ def transform(data):
             data -- the data in our variable structure
     """
 
-    # Transforms release date from year released to years since release
-    for i, item in enumerate(data['release_date']):
-        data['release_date'][i] = 2019 - item
+    transformed = {}
+
+    for category in data:
+        if category == "playcount" or category == "explicit" or category == "mode":
+            transformed[category] = []
+            for i, item in enumerate(data[category]):
+                transformed[category].append(item)
+        elif category != "name" and category != "artist" and category != "album" and category != "key" and category != "time_signature" and category[
+                                                                                                                                            :3] != "adj":
+            transformed[category] = []
+            transformed[category + "_sq"] = []
+            transformed[category + "_cu"] = []
+            for i, item in enumerate(data[category]):
+                transformed[category].append(item)
+                transformed[category + "_sq"].append(item ** 2)
+                transformed[category + "_cu"].append(item ** 3)
+
+    temp = dict(transformed)
+
+    for x in temp:
+        for y in temp:
+            if x != "playcount" and y != "playcount" and x[:3] > y[:3]:
+                transformed[x + "X" + y] = []
+                for i, item in enumerate(temp[x]):
+                    transformed[x + "X" + y].append(temp[x][i] * temp[y][i])
+
+    return transformed
 
 
-# TODO Find the best model with the best transformations
 def regress(data):
     """Makes a regression model with the data
 
@@ -90,15 +112,10 @@ def regress(data):
             data -- the data in our variable structure
     """
 
-    df = DataFrame(data, columns=['playcount', 'duration_ms', 'explicit', 'popularity', 'key', 'mode', 'time_signature',
-                                  'acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness', 'loudness',
-                                  'speechiness', 'valence', 'tempo', 'release_date', 'album_popularity'])
-
-    x = df[['duration_ms', 'explicit', 'popularity', 'key', 'mode', 'time_signature', 'acousticness', 'danceability',
-            'energy', 'instrumentalness', 'liveness', 'loudness', 'speechiness', 'valence', 'tempo', 'release_date',
-            'album_popularity']]
+    df = DataFrame(data, columns=list(data))
 
     y = df['playcount']
+    x = df.loc[:, df.columns != 'playcount']
 
     x = sm.add_constant(x)
 
@@ -129,8 +146,8 @@ def main():
         plot_scatter(category_lists[category], category, category_lists['playcount'])
         plot_hist(category_lists[category], category)
 
-    transform(category_lists)
-    regress(category_lists)
+    transformed = transform(category_lists)
+    regress(transformed)
 
 
 if __name__ == "__main__":
