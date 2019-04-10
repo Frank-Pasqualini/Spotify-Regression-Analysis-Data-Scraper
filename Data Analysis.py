@@ -1,5 +1,6 @@
 import pickle
 
+import math
 import matplotlib.pyplot as plt
 import numpy as np
 import statsmodels.api as sm
@@ -125,6 +126,22 @@ def regress(data):
     print(print_model)
 
 
+def mean_dif(data, category):
+    if category == 'name' or category == 'artist' or category == 'album' or ("adj_" + category) not in data:
+        return
+
+    x1 = np.mean(data[category])
+    x2 = np.mean(data["adj_" + category])
+    s1 = np.std(data[category])
+    s2 = np.std(data["adj_" + category])
+    n1 = len(data[category])
+    n2 = len(data["adj_" + category])
+
+    t = (x1 - x2) / math.sqrt(((s1 ** 2) / n1) + ((s2 ** 2) / n2))
+
+    print(category + " Difference of means vs adjusted t-score: " + str(t))
+
+
 def main():
     # Reads data from the file
     out_file = open('output.data', 'rb')
@@ -146,8 +163,11 @@ def main():
         plot_scatter(category_lists[category], category, category_lists['playcount'])
         plot_hist(category_lists[category], category)
 
-    transformed = transform(category_lists)
-    regress(transformed)
+    for category in category_lists:
+        mean_dif(category_lists, category)
+
+    # transformed = transform(category_lists)
+    # regress(transformed)
 
 
 if __name__ == "__main__":
